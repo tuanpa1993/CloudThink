@@ -21,6 +21,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace WebApplication1.Controllers
 { 
@@ -44,7 +45,19 @@ namespace WebApplication1.Controllers
             TableQuery<CharterData> query = new TableQuery<CharterData>()
                    .Where(TableQuery.GenerateFilterCondition("Name",
                                                              QueryComparisons.Equal,
-                                                            "Anhnph"));
+                
+                                                             "Anhnph"));
+            List<CharterResult> listChart = new List<CharterResult>();
+            for (int i = 0; i < 4; i++)
+            {
+                CharterResult ch = new CharterResult()
+                {
+                    Intention = 10,
+                    NonIntention = 9 ,
+                    TimeChart = nowtime,
+                };
+                listChart.Add(ch);
+            }
             List<int> listIstention = new List<int>();
             List<int> listNonIstention = new List<int>();
             foreach (CharterData entity in table.ExecuteQuery(query))
@@ -62,7 +75,9 @@ namespace WebApplication1.Controllers
             float percent =   (listIstention.Count + listNonIstention.Count);
 
             percent = (listIstention.Count / percent)*100;
-            return Ok(percent);
+            string json = JsonConvert.SerializeObject(new { CharterData = listChart });
+           // string js = JsonConvert.DeserializeObject(new { CharterData = listChart });
+            return Ok(json);
             
         }  
         [HttpPost]

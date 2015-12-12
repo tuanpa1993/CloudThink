@@ -8,6 +8,7 @@ using WebApplication1.Models;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 
 namespace WebApplication1.Controllers
 {
@@ -30,22 +31,48 @@ namespace WebApplication1.Controllers
                                                             chartdata.Name));
             List<int> listIstention = new List<int>();
             List<int> listNonIstention = new List<int>();
-            foreach (CharterData entity in table.ExecuteQuery(query))
+            List<CharterResult> listChart = new List<CharterResult>();
+            int checkLoop = 0;
+            try
             {
-                DateTime un = entity.Timestamp.Date;
-                string abc = entity.Gender;
-                string bc = entity.IsIntention;
-                int checkDuration = (nowtime - un).Days;
-                if (checkDuration == chartdata.Duration)
+                foreach (CharterData entity in table.ExecuteQuery(query))
                 {
-                    if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-                    else listNonIstention.Add(0);
+                    DateTime un = entity.Timestamp.Date;
+                    int checkDuration = (nowtime - un).Days;
+                    if (checkLoop != checkDuration && checkDuration >0)
+                    {
+                        if (checkLoop == 0)
+                        {
+                            checkLoop = checkDuration;
+                        }
+                        else
+                        {
+                            CharterResult ch = new CharterResult()
+                            {
+                                Intention = listIstention.Count,
+                                NonIntention = listNonIstention.Count,
+                                TimeChart = un,
+                            };
+                            listIstention.Clear();
+                            listNonIstention.Clear();
+                            checkLoop = checkDuration;
+                        }
+
+                    }
+                    if (checkDuration >= 0 && checkDuration <= chartdata.Duration)
+                    {
+                        if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                        else listNonIstention.Add(0);
+                    }
                 }
             }
-            float percent = (listIstention.Count + listNonIstention.Count);
-
-            percent = (listIstention.Count / percent) * 100;
-            return Ok(percent);
+            catch(Exception ex)
+            {
+                return Ok("error");
+            }
+                
+                string json = JsonConvert.SerializeObject(new { CharterData = listChart });
+                return Ok(json);
         }
     }
 }
