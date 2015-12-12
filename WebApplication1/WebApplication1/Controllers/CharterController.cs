@@ -13,31 +13,39 @@ namespace WebApplication1.Controllers
 {
     public class CharterController : ApiController
     {
-        [HttpGet]
-        public IHttpActionResult Get(string username)
+        [HttpPost]
+        public IHttpActionResult Post(ChartData chartdata)
         {
             string accountName = "cloudthink";
-            string accountKey = "1F/oKHxUjXl6Ox1D9fM74htSX+zugkYKmL2MjprPczZAhOeGgPcPBudIypvwkPRfTYypeho8/bksBapafBsFOw==";
+            string accountKey = "hVkTDM6KYgHZF1X8buidcV2Uwam1UTczsdZ9M2OIaMNkN12rR++mRZgzMH401dYcKBg0/3cRSX6EzAa6IXMW3g==";
             StorageCredentials creds = new StorageCredentials(accountName, accountKey);
             CloudStorageAccount account = new CloudStorageAccount(creds, useHttps: true);
             CloudTableClient client = account.CreateCloudTableClient();
-            CloudTable table = client.GetTableReference("cloudthink");
-            // table.CreateIfNotExists();
-            //string lowerlimit = DateTime.Today.AddDays(-52).ToString("yyyy-MM-dd");
+            CloudTable table = client.GetTableReference("cloudthinktest");
+            table.CreateIfNotExists();
+            DateTime nowtime = chartdata.TimeChart.Date;
+            TableQuery<CharterData> query = new TableQuery<CharterData>()
+                   .Where(TableQuery.GenerateFilterCondition("Name",
+                                                             QueryComparisons.Equal,
+                                                            chartdata.Name));
+            List<int> listIstention = new List<int>();
+            List<int> listNonIstention = new List<int>();
+            foreach (CharterData entity in table.ExecuteQuery(query))
+            {
+                DateTime un = entity.Timestamp.Date;
+                string abc = entity.Gender;
+                string bc = entity.IsIntention;
+                int checkDuration = (nowtime - un).Days;
+                if (checkDuration == chartdata.Duration)
+                {
+                    if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                    else listNonIstention.Add(0);
+                }
+            }
+            float percent = (listIstention.Count + listNonIstention.Count);
 
-            //string dateRangeFilter = TableQuery.CombineFilters(
-            //    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "dataprocess"),
-            //    TableOperators.And,
-            //    TableQuery.GenerateFilterConditionForDate("TimeStamp", QueryComparisons.GreaterThanOrEqual, DateTime.Today.AddDays(-52)));
-            //   TableQuery<DynamicTableEntity> projectionQuery = new TableQuery<DynamicTableEntity>().Select(new string[] { "IsIntention" });
-            //     EntityResolver<string> resolver = (pk, rk, ts, props, etag) => props.ContainsKey("IsIntention") ? props["IsIntention"].StringValue : null;
-            List<string> listData = new List<string>();
-            //   foreach (string projectedEmail in table.ExecuteQuery(projectionQuery, resolver, null, null))
-            //   {
-            //         listData.Add(projectedEmail);
-            //       Console.WriteLine(projectedEmail);
-            //    }
-            return Ok(listData);
+            percent = (listIstention.Count / percent) * 100;
+            return Ok(percent);
         }
     }
 }

@@ -209,6 +209,7 @@
     <Compile Include="Fus\MachineLeaning.cs" />
     <Compile Include="Fus\OutputObject.cs" />
     <Compile Include="Models\CharterData.cs" />
+    <Compile Include="Models\ChartData.cs" />
     <Compile Include="Models\EnergyData.cs" />
     <Compile Include="Models\FftData.cs" />
     <Compile Include="Models\GetWaveData.cs" />

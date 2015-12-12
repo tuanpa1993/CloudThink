@@ -34,35 +34,35 @@ namespace WebApplication1.Controllers
         {
 
             string accountName = "cloudthink";
-            string accountKey = "1F/oKHxUjXl6Ox1D9fM74htSX+zugkYKmL2MjprPczZAhOeGgPcPBudIypvwkPRfTYypeho8/bksBapafBsFOw==";
+            string accountKey = "hVkTDM6KYgHZF1X8buidcV2Uwam1UTczsdZ9M2OIaMNkN12rR++mRZgzMH401dYcKBg0/3cRSX6EzAa6IXMW3g==";
             StorageCredentials creds = new StorageCredentials(accountName, accountKey);
             CloudStorageAccount account = new CloudStorageAccount(creds, useHttps: true);
             CloudTableClient client = account.CreateCloudTableClient();
-            CloudTable table = client.GetTableReference("cloudthink");
+            CloudTable table = client.GetTableReference("cloudthinktest");
             table.CreateIfNotExists();
-            DateTime nowtime = DateTime.Now.Date;
+            DateTime nowtime = DateTime.Parse("12/12/2015 12:00:00 AM");
             TableQuery<CharterData> query = new TableQuery<CharterData>()
                    .Where(TableQuery.GenerateFilterCondition("Name",
                                                              QueryComparisons.Equal,
-                                                            "anhnph"));
+                                                            "Anhnph"));
             List<int> listIstention = new List<int>();
             List<int> listNonIstention = new List<int>();
             foreach (CharterData entity in table.ExecuteQuery(query))
             {
                 DateTime un = entity.Timestamp.Date;
+                string abc = entity.Gender;
+                string bc = entity.IsIntention;
                 int checkDuration = (nowtime - un).Days; 
-                if (checkDuration == 2)
+                if (checkDuration == 1)
                 {
-                    if (entity.Istention == 1) listIstention.Add(entity.Istention);
-                    else listNonIstention.Add(entity.Istention);
-                }
-               
-               
-                
-                string inst = entity.datetime; 
-                
+                    if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                    else listNonIstention.Add(0);
+                }                                              
             }
-            return Ok("abc");
+            float percent =   (listIstention.Count + listNonIstention.Count);
+
+            percent = (listIstention.Count / percent)*100;
+            return Ok(percent);
             
         }  
         [HttpPost]

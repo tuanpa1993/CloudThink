@@ -17,6 +17,7 @@ namespace WebApplication1.Models
         public int Duration { get; set; }
         public string datetime { get; set; }
         public string Name { get; set; }
-        public int Istention { get; set; }
+        public string Gender { get; set; }
+        public string IsIntention { get; set; }
     }
 }
