@@ -33,19 +33,22 @@ namespace WebApplication1.Controllers
             List<int> listNonIstention = new List<int>();
             List<CharterResult> listChart = new List<CharterResult>();
             int checkLoop = 0;
+            int checkEntity = 0;
             try
             {
                 foreach (CharterData entity in table.ExecuteQuery(query))
                 {
                     DateTime un = entity.Timestamp.Date;
                     int checkDuration = (nowtime - un).Days;
-                    if (checkLoop != checkDuration && checkDuration >0)
+                    if (chartdata.Duration == 0)
                     {
-                        if (checkLoop == 0)
+                        if (checkDuration == 0)
                         {
-                            checkLoop = checkDuration;
+                            if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                            else listNonIstention.Add(0);
                         }
-                        else
+                        checkEntity = checkEntity + 1;
+                        if (checkEntity == table.ExecuteQuery(query).Count())
                         {
                             CharterResult ch = new CharterResult()
                             {
@@ -53,17 +56,42 @@ namespace WebApplication1.Controllers
                                 NonIntention = listNonIstention.Count,
                                 TimeChart = un,
                             };
+                            listChart.Add(ch);
                             listIstention.Clear();
                             listNonIstention.Clear();
-                            checkLoop = checkDuration;
                         }
-
+                        
                     }
-                    if (checkDuration >= 0 && checkDuration <= chartdata.Duration)
+                    else if (chartdata.Duration > 0)
                     {
-                        if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-                        else listNonIstention.Add(0);
+                        if (checkLoop != checkDuration && checkDuration > 0)
+                        {
+                            if (checkLoop == 0)
+                            {
+                                checkLoop = checkDuration;
+                            }
+                            else
+                            {
+                                CharterResult ch = new CharterResult()
+                                {
+                                    Intention = listIstention.Count,
+                                    NonIntention = listNonIstention.Count,
+                                    TimeChart = un,
+                                };
+                                listChart.Add(ch);
+                                listIstention.Clear();
+                                listNonIstention.Clear();
+                                checkLoop = checkDuration;
+                            }
+
+                        }
+                        if (checkDuration >= 0 && checkDuration <= chartdata.Duration)
+                        {
+                            if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                            else listNonIstention.Add(0);
+                        }
                     }
+                   
                 }
             }
             catch(Exception ex)

@@ -33,7 +33,6 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IHttpActionResult Get([FromUri]CloudData cloud) 
         {
-
             string accountName = "cloudthink";
             string accountKey = "hVkTDM6KYgHZF1X8buidcV2Uwam1UTczsdZ9M2OIaMNkN12rR++mRZgzMH401dYcKBg0/3cRSX6EzAa6IXMW3g==";
             StorageCredentials creds = new StorageCredentials(accountName, accountKey);
@@ -41,43 +40,84 @@ namespace WebApplication1.Controllers
             CloudTableClient client = account.CreateCloudTableClient();
             CloudTable table = client.GetTableReference("cloudthinktest");
             table.CreateIfNotExists();
-            DateTime nowtime = DateTime.Parse("12/12/2015 12:00:00 AM");
             TableQuery<CharterData> query = new TableQuery<CharterData>()
                    .Where(TableQuery.GenerateFilterCondition("Name",
                                                              QueryComparisons.Equal,
-                
-                                                             "Anhnph"));
-            List<CharterResult> listChart = new List<CharterResult>();
-            for (int i = 0; i < 4; i++)
-            {
-                CharterResult ch = new CharterResult()
-                {
-                    Intention = 10,
-                    NonIntention = 9 ,
-                    TimeChart = nowtime,
-                };
-                listChart.Add(ch);
-            }
+                                                            "Anhnph"));
+            int typeDate = 1;
+            DateTime inputTime = DateTime.Parse("12/11/2015 12:00:00 AM");
             List<int> listIstention = new List<int>();
             List<int> listNonIstention = new List<int>();
-            foreach (CharterData entity in table.ExecuteQuery(query))
+            List<CharterResult> listChart = new List<CharterResult>();
+            if (typeDate == 0)
             {
-                DateTime un = entity.Timestamp.Date;
-                string abc = entity.Gender;
-                string bc = entity.IsIntention;
-                int checkDuration = (nowtime - un).Days; 
-                if (checkDuration == 1)
+                try
                 {
-                    if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-                    else listNonIstention.Add(0);
-                }                                              
-            }
-            float percent =   (listIstention.Count + listNonIstention.Count);
+                    foreach (CharterData entity in table.ExecuteQuery(query))
+                    {
+                        DateTime timeQuery = entity.Timestamp.Date;
+                        int checkDuration = (inputTime - timeQuery).Days;
+                        if (checkDuration == 0)
+                        {
+                            if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                            else listNonIstention.Add(0);
+                        }
+                    }
+                    CharterResult ch = new CharterResult()
+                    {
+                        Intention = listIstention.Count,
+                        NonIntention = listNonIstention.Count,
+                        TimeChart = inputTime,
+                    };
+                    listChart.Add(ch);
+                    listIstention.Clear();
+                    listNonIstention.Clear();
+                }
+                catch (Exception ex)
+                {
 
-            percent = (listIstention.Count / percent)*100;
+                }
+            }
+            else if (typeDate == 1)
+            {
+                try
+                {
+                    DateTime firstDayOfMonth = DateTime.Parse("12/1/2015");
+                    DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                    int durationDate = (lastDayOfMonth - firstDayOfMonth).Days;
+                    for (int i = 0; i <= durationDate; i++)
+                    {
+                        foreach (CharterData entity in table.ExecuteQuery(query))
+                        {
+                            DateTime CheckTime = entity.Timestamp.Date;
+                            int checkDuration = (CheckTime - firstDayOfMonth).Days;
+                            if (checkDuration == i)
+                            {
+                                if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                                else listNonIstention.Add(0);
+                               
+                            }
+                        }
+                        CharterResult ch = new CharterResult()
+                        {
+                            Intention = listIstention.Count,
+                            NonIntention = listNonIstention.Count,
+                            TimeChart = firstDayOfMonth.AddDays(i),
+                        };
+                        listChart.Add(ch);
+                        listIstention.Clear();
+                        listNonIstention.Clear();
+                        
+                    }
+                   
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
             string json = JsonConvert.SerializeObject(new { CharterData = listChart });
-           // string js = JsonConvert.DeserializeObject(new { CharterData = listChart });
-            return Ok(json);
+            return Ok(listChart);
             
         }  
         [HttpPost]
