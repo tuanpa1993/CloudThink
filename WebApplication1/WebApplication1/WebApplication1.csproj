@@ -197,7 +197,7 @@
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\CharterController.cs" />
+    <Compile Include="Controllers\ChartController.cs" />
     <Compile Include="Controllers\CloudDataController.cs" />
     <Compile Include="Controllers\MachineLeaningController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -233,6 +233,7 @@
   <ItemGroup>
     <Content Include="apiapp.json" />
     <None Include="Properties\PublishProfiles\CloudThink.pubxml" />
+    <None Include="Properties\PublishProfiles\CloudThinkAPI.pubxml" />
     <None Include="Properties\PublishProfiles\CloudThinksApi.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

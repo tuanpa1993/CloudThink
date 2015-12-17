@@ -271,8 +271,8 @@ namespace WebApplication1.Fus
         public void InsertData(List<Double> data, CloudData cloud )
         {
             double[] test = data.ToArray();
-            string accountName = "cloudthink";
-            string accountKey = "1F/oKHxUjXl6Ox1D9fM74htSX+zugkYKmL2MjprPczZAhOeGgPcPBudIypvwkPRfTYypeho8/bksBapafBsFOw==";
+            string accountName = "cloudthinkstorage";
+            string accountKey = "u0gOpUjoxc9OWpjSBTSvm7tFHZPz8r8iFKK4uWxjtnC3Sh17oKytYMxR69lsfmGfkcmoQNmPPRWbD12l8QyNbg==";
             Descriptive desp = new Descriptive(test);
             desp.Analyze();
             LibHander output = new LibHander();

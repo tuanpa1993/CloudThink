@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <parameter name="IIS Web Application Name" description="" value="CloudThinksApi" tags="IisApp">
+  <parameter name="IIS Web Application Name" description="" value="CloudThinkAPI" tags="IisApp">
     <parameterEntry kind="ProviderPath" scope="IisApp" match="^D:\\study\\Cloud\\CloudThink\\WebApplication1\\WebApplication1\\obj\\Release\\Package\\PackageTmp$" />
     <parameterEntry kind="ProviderPath" scope="setAcl" match="^D:\\study\\Cloud\\CloudThink\\WebApplication1\\WebApplication1\\obj\\Release\\Package\\PackageTmp$" />
   </parameter>
-  <parameter name="WebApplication1Context-Web.config Connection String" description="WebApplication1Context Connection String used in web.config by the application to access the database." value="Data Source=(localdb)\v11.0; Initial Catalog=WebApplication1Context-20151014232015; Integrated Security=True; MultipleActiveResultSets=True; AttachDbFilename=|DataDirectory|WebApplication1Context-20151014232015.mdf" tags="SqlConnectionString">
+  <parameter name="WebApplication1Context-Web.config Connection String" description="" value="Data Source=(localdb)\v11.0; Initial Catalog=WebApplication1Context-20151014232015; Integrated Security=True; MultipleActiveResultSets=True; AttachDbFilename=|DataDirectory|WebApplication1Context-20151014232015.mdf" tags="">
     <parameterEntry kind="XmlFile" scope="D:\\study\\Cloud\\CloudThink\\WebApplication1\\WebApplication1\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='WebApplication1Context']/@connectionString" />
   </parameter>
 </parameters>

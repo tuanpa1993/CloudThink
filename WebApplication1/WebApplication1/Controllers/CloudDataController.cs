@@ -33,8 +33,8 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IHttpActionResult Get([FromUri]CloudData cloud) 
         {
-            string accountName = "cloudthink";
-            string accountKey = "hVkTDM6KYgHZF1X8buidcV2Uwam1UTczsdZ9M2OIaMNkN12rR++mRZgzMH401dYcKBg0/3cRSX6EzAa6IXMW3g==";
+            string accountName = "cloudthinkstorage";
+            string accountKey = "u0gOpUjoxc9OWpjSBTSvm7tFHZPz8r8iFKK4uWxjtnC3Sh17oKytYMxR69lsfmGfkcmoQNmPPRWbD12l8QyNbg==";
             StorageCredentials creds = new StorageCredentials(accountName, accountKey);
             CloudStorageAccount account = new CloudStorageAccount(creds, useHttps: true);
             CloudTableClient client = account.CreateCloudTableClient();
@@ -44,80 +44,64 @@ namespace WebApplication1.Controllers
                    .Where(TableQuery.GenerateFilterCondition("Name",
                                                              QueryComparisons.Equal,
                                                             "Anhnph"));
-            int typeDate = 1;
-            DateTime inputTime = DateTime.Parse("12/11/2015 12:00:00 AM");
+            DateTime inputTime = DateTime.Parse("12/15/2015");
             List<int> listIstention = new List<int>();
             List<int> listNonIstention = new List<int>();
             List<CharterResult> listChart = new List<CharterResult>();
-            if (typeDate == 0)
+            int checkDay = 0;
+            int checkAdd = 0;
+            foreach (CharterData entity in table.ExecuteQuery(query))
             {
-                try
+                int checkdate = (inputTime-entity.Timestamp.Date).Days;
+                if (checkdate == 0)
                 {
-                    foreach (CharterData entity in table.ExecuteQuery(query))
+                    int day = entity.Timestamp.Hour;
+                    if (checkDay != day)
                     {
-                        DateTime timeQuery = entity.Timestamp.Date;
-                        int checkDuration = (inputTime - timeQuery).Days;
-                        if (checkDuration == 0)
+                        if (listIstention.Count == 0 && listNonIstention.Count == 0)
                         {
-                            if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-                            else listNonIstention.Add(0);
+                            checkDay = day;
+                            listIstention.Clear();
+                            listNonIstention.Clear();
+                        }
+                        else
+                        {
+                            checkDay = day;
+                            CharterResult ch = new CharterResult()
+                            {
+                                Intention = listIstention.Count,
+                                NonIntention = listNonIstention.Count,
+                                Hour = checkDay + 1,
+                            };
+                            listChart.Add(ch);
+                            listIstention.Clear();
+                            listNonIstention.Clear();
                         }
                     }
-                    CharterResult ch = new CharterResult()
-                    {
-                        Intention = listIstention.Count,
-                        NonIntention = listNonIstention.Count,
-                        TimeChart = inputTime,
-                    };
-                    listChart.Add(ch);
-                    listIstention.Clear();
-                    listNonIstention.Clear();
+                    if (entity.IsIntention.Equals("1")) listIstention.Add(1);
+                    else listNonIstention.Add(0);
                 }
-                catch (Exception ex)
+                else if (checkdate==-1)
                 {
-
-                }
-            }
-            else if (typeDate == 1)
-            {
-                try
-                {
-                    DateTime firstDayOfMonth = DateTime.Parse("12/1/2015");
-                    DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-                    int durationDate = (lastDayOfMonth - firstDayOfMonth).Days;
-                    for (int i = 0; i <= durationDate; i++)
+                    if (checkAdd == 0)
                     {
-                        foreach (CharterData entity in table.ExecuteQuery(query))
-                        {
-                            DateTime CheckTime = entity.Timestamp.Date;
-                            int checkDuration = (CheckTime - firstDayOfMonth).Days;
-                            if (checkDuration == i)
-                            {
-                                if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-                                else listNonIstention.Add(0);
-                               
-                            }
-                        }
                         CharterResult ch = new CharterResult()
                         {
                             Intention = listIstention.Count,
                             NonIntention = listNonIstention.Count,
-                            TimeChart = firstDayOfMonth.AddDays(i),
+                            Hour = checkDay + 1,
                         };
                         listChart.Add(ch);
                         listIstention.Clear();
                         listNonIstention.Clear();
-                        
+                        checkAdd = 1;
                     }
                    
                 }
-                catch (Exception ex)
-                {
-
-                }
             }
+
             string json = JsonConvert.SerializeObject(new { CharterData = listChart });
-            return Ok(listChart);
+            return Ok(new { CharterData = listChart });
             
         }  
         [HttpPost]
@@ -125,8 +109,8 @@ namespace WebApplication1.Controllers
         {
 
 
-            string accountName = "cloudthink";
-            string accountKey = "hVkTDM6KYgHZF1X8buidcV2Uwam1UTczsdZ9M2OIaMNkN12rR++mRZgzMH401dYcKBg0/3cRSX6EzAa6IXMW3g==";
+            string accountName = "cloudthinkstorage";
+            string accountKey = "u0gOpUjoxc9OWpjSBTSvm7tFHZPz8r8iFKK4uWxjtnC3Sh17oKytYMxR69lsfmGfkcmoQNmPPRWbD12l8QyNbg==";
             try
             {
                 StorageCredentials creds = new StorageCredentials(accountName, accountKey);
