@@ -231,6 +231,43 @@ namespace WebApplication1.Fus
 
              return builder.ToString();
          }
+         public PointData dataCloudTest(List<Double> data, CloudData cloud)
+         {
+             double[] test = data.ToArray();
+             Descriptive desp = new Descriptive(test);
+             desp.Analyze();
+             LibHander output = new LibHander();
+             FftEeg fe = new FftEeg();
+             FftData fd = new FftData();
+             fd = fe.Ffteeg(test, 512);
+             Random rd = new Random();
+             double[] arburg = output.arburg(test, 6);
+             string Rand1 = RandomString(rd.Next(4, 10));
+             int sum = 1;
+             PointData entity = new PointData("dataprocess", "" + Rand1)
+             {
+                 percent_alpha = output.vget_percent_frequency(fd, "alpha"),
+                 percent_beta = output.vget_percent_frequency(fd, "beta"),
+                 psd_alpha = output.vget_energy(test, 512, "alpha"),
+                 psd_beta = output.vget_energy(test, 512, "beta"),
+                 Kurtosis = Tools.Kurtosis(test),
+                 Skewness = Tools.Skewness(test),
+                 arburg_1 = arburg[0],
+                 arburg_2 = arburg[1],
+                 arburg_3 = arburg[2],
+                 arburg_4 = arburg[3],
+                 arburg_5 = arburg[4],
+                 arburg_6 = arburg[5],
+                 secondDiffisNormalize = output.vget_mean_secondDiff(test, true),
+                 firstDiffisNormalize = output.vget_mean_firstDiff(test, true),
+                 Name = "Anhnph",
+                 Age = 18,
+                 IsIntention = 1,
+                 Gender = "F",
+
+             };
+             return entity;
+         }
          public PointData dataCloud(List<Double> data, CloudData cloud)
          {
              double[] test = data.ToArray();
