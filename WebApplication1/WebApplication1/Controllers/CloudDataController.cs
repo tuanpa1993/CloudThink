@@ -72,6 +72,7 @@ namespace WebApplication1.Controllers
                 if (sqv < test.Length) div = div + 1;
                 List<Double> dl = new List<double>();
                 int lap = test.Length / 16;
+                int inten = 0;
                 for (int i = 0; i < test.Length; i++)
                 {
                     if (i == 0)
@@ -84,9 +85,11 @@ namespace WebApplication1.Controllers
                         }
 
 
-
+                        inten = inten + 1;
                         InsertTable testFun = new InsertTable();
-                        entity = testFun.dataCloudTest(dl, cloud);
+                        if (inten <= 20)
+                            entity = testFun.dataCloudTest(dl, cloud, 1);
+                        else entity = testFun.dataCloudTest(dl, cloud, 0);
                         batchOperation.Insert(entity);
 
                         //TableOperation inser = TableOperation.Insert(entity);
@@ -103,9 +106,11 @@ namespace WebApplication1.Controllers
                             {
                                 dl.Add(test[j]);
                             }
+                            inten = inten + 1;
                             InsertTable testFun = new InsertTable();
-
-                            entity = testFun.dataCloudTest(dl, cloud);
+                            if (inten <= 20)
+                                entity = testFun.dataCloudTest(dl, cloud, 1);
+                            else entity = testFun.dataCloudTest(dl, cloud, 0);
                             // TableOperation inser = TableOperation.Insert(entity);
                             batchOperation.Insert(entity);
                             //table.Execute(inser);
@@ -124,6 +129,7 @@ namespace WebApplication1.Controllers
                     {
                         table.ExecuteBatch(batchOperation);
                         batchOperation.Clear();
+                        inten = 0;
                         // batchOperation.Clear();
                         //table.ExecuteBatch(batchOperation);
                         // demCheck = 0;

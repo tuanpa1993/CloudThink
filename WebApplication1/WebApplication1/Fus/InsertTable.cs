@@ -231,7 +231,7 @@ namespace WebApplication1.Fus
 
              return builder.ToString();
          }
-         public PointData dataCloudTest(List<Double> data, CloudData cloud)
+         public PointData dataCloudTest(List<Double> data, CloudData cloud, int inten)
          {
              double[] test = data.ToArray();
              Descriptive desp = new Descriptive(test);
@@ -262,7 +262,7 @@ namespace WebApplication1.Fus
                  firstDiffisNormalize = output.vget_mean_firstDiff(test, true),
                  Name = "Anhnph",
                  Age = 18,
-                 IsIntention = 1,
+                 IsIntention = inten,
                  Gender = "F",
 
              };

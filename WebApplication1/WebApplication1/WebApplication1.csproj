@@ -199,6 +199,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ChartController.cs" />
     <Compile Include="Controllers\CloudDataController.cs" />
+    <Compile Include="Controllers\CollectDataController.cs" />
     <Compile Include="Controllers\MachineLeaningController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\TestController.cs" />
