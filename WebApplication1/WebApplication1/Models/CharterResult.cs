@@ -10,5 +10,6 @@ namespace WebApplication1.Models
         public int Hour { get; set; }
         public int Intention { get; set; }
         public int NonIntention { get; set; }
+        public DateTime LastTime { get; set; }
     }
 }

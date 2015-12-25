@@ -56,10 +56,10 @@ namespace WebApplication1.Fus
                      {
                      }
                  };
-                 const string apiKey = "vRqr2moZYGn5XBv8E8Ap+X7qfb38gLf9nsp+EoUjEZNaf1WgFifGXxlVE0DcNNyHT7AhYj4s7uVZyecWi92Zkw=="; // Replace this with the API key for the web service
+                 const string apiKey = "WJl2x3Et/+vJBwOEg1tXY5A5WJPX4vHhKTfsIgySJCOZoKat3HXzWxMlXfLXx7Lm2f3kGrrZf9/nUiOYFBvkBA=="; // Replace this with the API key for the web service
                  client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
-                 client.BaseAddress = new Uri("https://asiasoutheast.services.azureml.net/workspaces/4301cc0e7cb149dcb5812642e453d8f7/services/a99bffd83ab34bdaad98d130e8ec9643/execute?api-version=2.0&details=true");
+                 client.BaseAddress = new Uri("https://asiasoutheast.services.azureml.net/workspaces/c737d7f08898413e8f44c7ac4f7ed9d1/services/9c88a5bf90f640b78d234a03728c7a57/execute?api-version=2.0&details=true");
 
                  // WARNING: The 'await' statement below can result in a deadlock if you are calling this code from the UI thread of an ASP.Net application.
                  // One way to address this would be to call ConfigureAwait(false) so that the execution does not attempt to resume on the original context.
@@ -260,7 +260,7 @@ namespace WebApplication1.Fus
                  arburg_6 = arburg[5],
                  secondDiffisNormalize = output.vget_mean_secondDiff(test, true),
                  firstDiffisNormalize = output.vget_mean_firstDiff(test, true),
-                 Name = "Anhnph",
+                 Name = "anhnph",
                  Age = 18,
                  IsIntention = inten,
                  Gender = "F",
@@ -305,7 +305,7 @@ namespace WebApplication1.Fus
              };
              return entity;
          }
-        public void InsertData(List<Double> data, CloudData cloud )
+        public void InsertData(List<Double> data, CloudData cloud, string inten )
         {
             double[] test = data.ToArray();
             string accountName = "cloudthinkstorage";
@@ -319,18 +319,20 @@ namespace WebApplication1.Fus
                 StorageCredentials creds = new StorageCredentials(accountName, accountKey);
                 CloudStorageAccount account = new CloudStorageAccount(creds, useHttps: true);
                 CloudTableClient client = account.CreateCloudTableClient();
-                CloudTable table = client.GetTableReference("cloudthink");
+                CloudTable table = client.GetTableReference("cloudthinktest");
                 table.CreateIfNotExists();
-                Random rd = new Random();
                 FftEeg fe = new FftEeg();
                 FftData fd = new FftData();
                 fd = fe.Ffteeg(test, 512);
-                double [] arburg = output.arburg(test,6);
-                PointData entity = new PointData("dataprocess", "" + rd.Next(1, 100000000))
+                Random rd = new Random();
+                double[] arburg = output.arburg(test, 6);
+                string Rand1 = RandomString(rd.Next(4, 10));
+                int sum = 1;
+                PointData entity = new PointData("dataprocess", "" + Rand1)
                 {
                     percent_alpha = output.vget_percent_frequency(fd, "alpha"),
                     percent_beta = output.vget_percent_frequency(fd, "beta"),
-                    psd_alpha = output.vget_energy(test,512,"alpha"),
+                    psd_alpha = output.vget_energy(test, 512, "alpha"),
                     psd_beta = output.vget_energy(test, 512, "beta"),
                     Kurtosis = Tools.Kurtosis(test),
                     Skewness = Tools.Skewness(test),
@@ -344,8 +346,9 @@ namespace WebApplication1.Fus
                     firstDiffisNormalize = output.vget_mean_firstDiff(test, true),
                     Name = cloud.Name,
                     Age = cloud.Age,
-                    IsIntention = cloud.IsIntention,
-                    Gender = cloud.Gender
+                    IsIntention = int.Parse(inten),
+                    Gender = cloud.Gender,
+
                 };
                 TableOperation inser = TableOperation.Insert(entity);
                 table.Execute(inser);

@@ -14,93 +14,15 @@ namespace WebApplication1.Controllers
 {
     public class ChartController : ApiController
     {
+        [HttpGet]
+        public IHttpActionResult Get([FromUri]CloudData cloud)
+        {
+    
+            return Ok("You do not have permission to view this directory or page.");
+        }
         [HttpPost]
         public IHttpActionResult Post(ChartData chartdata)
         {
-            //string accountName = "cloudthinkstorage";
-            //string accountKey = "u0gOpUjoxc9OWpjSBTSvm7tFHZPz8r8iFKK4uWxjtnC3Sh17oKytYMxR69lsfmGfkcmoQNmPPRWbD12l8QyNbg==";
-            //StorageCredentials creds = new StorageCredentials(accountName, accountKey);
-            //CloudStorageAccount account = new CloudStorageAccount(creds, useHttps: true);
-            //CloudTableClient client = account.CreateCloudTableClient();
-            //CloudTable table = client.GetTableReference("cloudthinktest");
-            //table.CreateIfNotExists();
-            //TableQuery<CharterData> query = new TableQuery<CharterData>()
-            //       .Where(TableQuery.GenerateFilterCondition("Name",
-            //                                                 QueryComparisons.Equal,
-            //                                                chartdata.Name));
-            //int typeDate = chartdata.TypeDate;
-            //DateTime inputTime = chartdata.TimeChart.Date;
-            //List<int> listIstention = new List<int>();
-            //List<int> listNonIstention = new List<int>();
-            //List<CharterResult> listChart = new List<CharterResult>();
-            //if (typeDate == 0)
-            //{
-            //    try
-            //    {
-            //        foreach (CharterData entity in table.ExecuteQuery(query))
-            //        {
-            //            DateTime timeQuery = entity.Timestamp.Date;
-            //            int checkDuration = (inputTime - timeQuery).Days;
-            //            if (checkDuration == 0)
-            //            {
-            //                if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-            //                else listNonIstention.Add(0);
-            //            }
-            //        }
-            //        CharterResult ch = new CharterResult()
-            //        {
-            //            Intention = listIstention.Count,
-            //            NonIntention = listNonIstention.Count,
-            //            TimeChart = inputTime,
-            //        };
-            //        listChart.Add(ch);
-            //        listIstention.Clear();
-            //        listNonIstention.Clear();
-            //    }
-            //    catch (Exception ex)
-            //    {
-
-            //    }
-            //}
-            //else if (typeDate == 1)
-            //{
-            //    try
-            //    {
-            //        DateTime firstDayOfMonth = inputTime;
-            //        DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            //        int durationDate = (lastDayOfMonth - firstDayOfMonth).Days;
-            //        for (int i = 0; i <= durationDate; i++)
-            //        {
-            //            foreach (CharterData entity in table.ExecuteQuery(query))
-            //            {
-            //                DateTime CheckTime = entity.Timestamp.Date;
-            //                int checkDuration = (CheckTime - firstDayOfMonth).Days;
-            //                if (checkDuration == i)
-            //                {
-            //                    if (entity.IsIntention.Equals("1")) listIstention.Add(1);
-            //                    else listNonIstention.Add(0);
-
-            //                }
-            //            }
-            //            CharterResult ch = new CharterResult()
-            //            {
-            //                Intention = listIstention.Count,
-            //                NonIntention = listNonIstention.Count,
-            //                TimeChart = firstDayOfMonth.AddDays(i),
-            //            };
-            //            listChart.Add(ch);
-            //            listIstention.Clear();
-            //            listNonIstention.Clear();
-
-            //        }
-
-            //    }
-            //    catch (Exception ex)
-            //    {
-
-            //    }
-            //}
-           // string json = JsonConvert.SerializeObject(new { CharterData = listChart });
             string accountName = "cloudthinkstorage";
             string accountKey = "u0gOpUjoxc9OWpjSBTSvm7tFHZPz8r8iFKK4uWxjtnC3Sh17oKytYMxR69lsfmGfkcmoQNmPPRWbD12l8QyNbg==";
             StorageCredentials creds = new StorageCredentials(accountName, accountKey);
@@ -118,13 +40,17 @@ namespace WebApplication1.Controllers
             List<CharterResult> listChart = new List<CharterResult>();
             int checkDay = 0;
             int checkAdd = 0;
-            foreach (CharterData entity in table.ExecuteQuery(query))
+            int checkLastTime = 0;
+            int lasttimeCheck = table.ExecuteQuery(query).Count();
+            DateTime lastTime = new DateTime();
+            foreach (CharterData entity in table.ExecuteQuery(query).OrderBy(b => b.Timestamp))
             {
                 int checkdate = (inputTime - entity.Timestamp.Date).Days;
+                checkLastTime = checkLastTime + 1;
                 if (checkdate == 0)
                 {
                     int day = entity.Timestamp.Hour;
-                    if (checkDay != day)
+                    if (checkDay != day && checkdate == 0)
                     {
                         if (listIstention.Count == 0 && listNonIstention.Count == 0)
                         {
@@ -134,7 +60,7 @@ namespace WebApplication1.Controllers
                         }
                         else
                         {
-                            checkDay = day;
+
                             CharterResult ch = new CharterResult()
                             {
                                 Intention = listIstention.Count,
@@ -144,14 +70,10 @@ namespace WebApplication1.Controllers
                             listChart.Add(ch);
                             listIstention.Clear();
                             listNonIstention.Clear();
+                            checkDay = day;
                         }
                     }
-                    if (entity.IsIntention==1) listIstention.Add(1);
-                    else listNonIstention.Add(0);
-                }
-                else if (checkdate == -1)
-                {
-                    if (checkAdd == 0)
+                    else if (checkDay != day && checkdate != 0)
                     {
                         CharterResult ch = new CharterResult()
                         {
@@ -162,8 +84,14 @@ namespace WebApplication1.Controllers
                         listChart.Add(ch);
                         listIstention.Clear();
                         listNonIstention.Clear();
-                        checkAdd = 1;
+                        checkDay = day;
                     }
+                    if (entity.IsIntention == 1) listIstention.Add(1);
+                    else listNonIstention.Add(0);
+                }
+                if (checkLastTime == lasttimeCheck)
+                {
+                    lastTime = entity.Timestamp.DateTime;
 
                 }
             }
@@ -174,12 +102,23 @@ namespace WebApplication1.Controllers
                     Intention = listIstention.Count,
                     NonIntention = listNonIstention.Count,
                     Hour = checkDay + 1,
+                    
                 };
                 listChart.Add(ch1);
                 listIstention.Clear();
                 listNonIstention.Clear();
-             
+
             }
+            CharterResult ch2 = new CharterResult()
+            {
+                Intention = listIstention.Count,
+                NonIntention = listNonIstention.Count,
+                Hour = checkDay + 1,
+                LastTime = lastTime,
+            };
+            listChart.Add(ch2);
+            listIstention.Clear();
+            listNonIstention.Clear();
             string json = JsonConvert.SerializeObject(new { CharterData = listChart });
             return Ok(new { CharterData = listChart });
         

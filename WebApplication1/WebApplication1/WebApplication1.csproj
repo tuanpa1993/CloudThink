@@ -203,6 +203,7 @@
     <Compile Include="Controllers\MachineLeaningController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="Controllers\TestDataController.cs" />
     <Compile Include="Fus\FftEeg.cs" />
     <Compile Include="Fus\GetWave.cs" />
     <Compile Include="Fus\GetWaveRange.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -33,7 +34,6 @@ namespace WebApplication1.Fus
             double[] data_value = dl.ToArray();
             dl.Clear();
             int nlength = data_value.Length;
-           // double pow = nextpow2(nlength);\
             int checkdev = nlength % 2;
             double nfft;
             if (checkdev == 1)
@@ -41,9 +41,6 @@ namespace WebApplication1.Fus
                 nfft = nlength + 1;
             }
             else nfft = nlength;
-            
-           // double abc = 2.NumbersBetween(nlength);
-
             double logLength = Math.Ceiling(Math.Log((double)data_value.Length, 2.0));
             int paddedLength = (int)Math.Pow(2.0, Math.Min(Math.Max(1.0, logLength), 14.0));
 
@@ -52,11 +49,6 @@ namespace WebApplication1.Fus
             {
                 complex[i] = new AForge.Math.Complex(data_value[i], 0);
             }
-            //for (int i = 0; i < paddedLength; i++)
-            //{
-            //    complex[i] = new AForge.Math.Complex(0, 0);
-            //}
-   //         int n = complex.GetLength(1);
             FourierTransform.FFT(complex , FourierTransform.Direction.Forward);
            
       
